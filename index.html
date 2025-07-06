@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Marangon</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #fef2f2;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+      transition: background-color 1s, color 1s;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #d6336c;
+    }
+
+    label {
+      font-size: 1.2em;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #ff8fa3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #ff6f91;
+    }
+
+    .message {
+      font-size: 1.5em;
+      margin-top: 30px;
+    }
+
+    /* Corações animados */
+    .heart {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: red;
+      transform: rotate(45deg);
+      animation: floatUp 5s linear infinite;
+      top: 100%;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -15px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: -15px;
+      top: 0;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(45deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-800px) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    /* Bichinhos de pelúcia */
+    .teddy {
+      width: 100px;
+      margin: 20px;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #f2f2f2;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Barra de carregamento */
+    .progress-container {
+      width: 60%;
+      height: 30px;
+      border: 1px solid #444;
+      margin: 30px auto;
+      background-color: #333;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background-color: #e63946;
+      transition: width 0.2s ease-in-out;
+    }
+
+    .loading-text {
+      margin-top: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Você gosta do Marangon?</h1>
+
+  <form id="marangon-form">
+    <label><input type="radio" name="resposta" value="sim"> Sim</label>
+    <label><input type="radio" name="resposta" value="nao"> Não</label>
+    <br><br>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <div class="message" id="mensagem"></div>
+  <div id="decoracoes"></div>
+
+  <!-- Barra de carregamento -->
+  <div id="loading-section" class="hidden">
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="loading-text">Deletando pasta system32...</div>
+  </div>
+
+  <script>
+    const form = document.getElementById('marangon-form');
+    const mensagem = document.getElementById('mensagem');
+    const decoracoes = document.getElementById('decoracoes');
+    const loadingSection = document.getElementById('loading-section');
+    const progressBar = document.getElementById('progress-bar');
+
+    function criarCoracoes() {
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+        decoracoes.appendChild(heart);
+      }
+    }
+
+    function mostrarBichinhos() {
+      const bichinhos = [
+        'https://img.icons8.com/external-flat-juicy-fish/64/000000/external-teddy-bear-pets-and-animals-external-flat-juicy-fish.png', // urso
+        'https://img.icons8.com/external-flat-juicy-fish/64/000000/external-rabbit-pets-and-animals-external-flat-juicy-fish.png', // coelho
+        'https://img.icons8.com/external-flat-juicy-fish/64/000000/external-kitten-pets-and-animals-external-flat-juicy-fish.png'  // gato
+      ];
+      bichinhos.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = 'bichinho';
+        img.className = 'teddy';
+        decoracoes.appendChild(img);
+      });
+    }
+
+    function iniciarBarraCarregamento() {
+      let largura = 0;
+      progressBar.style.width = '0%';
+      const intervalo = setInterval(() => {
+        if (largura >= 100) {
+          clearInterval(intervalo);
+          document.querySelector('.loading-text').textContent = "Erro: Permissão negada. Abortando...";
+        } else {
+          largura++;
+          progressBar.style.width = largura + '%';
+        }
+      }, 50);
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const resposta = document.querySelector('input[name="resposta"]:checked');
+
+      if (!resposta) {
+        mensagem.textContent = 'Por favor, selecione uma opção.';
+        return;
+      }
+
+      form.classList.add('hidden');
+      decoracoes.innerHTML = '';
+      mensagem.innerHTML = '';
+      loadingSection.classList.add('hidden');
+
+      if (resposta.value === 'sim') {
+        document.body.classList.remove('dark-mode');
+        mensagem.innerHTML = 'Awnn! Eu também gosto de você! 💖';
+        criarCoracoes();
+        mostrarBichinhos();
+      } else {
+        document.body.classList.add('dark-mode');
+        mensagem.innerHTML = 'Tudo bem... <br>(o Marangon vai lembrar disso)';
+        loadingSection.classList.remove('hidden');
+        iniciarBarraCarregamento();
+      }
+    });
+  </script>
+
+</body>
+</html>
